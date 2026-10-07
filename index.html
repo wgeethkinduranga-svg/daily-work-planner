@@ -1,0 +1,6518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Daily Work Planner</title>
+
+<style>
+:root{
+  --bg:#f3f6fb;
+  --surface:#fff;
+  --surface2:#f8fafc;
+  --text:#172033;
+  --muted:#64748b;
+  --border:#e2e8f0;
+  --primary:#2563eb;
+  --primary-dark:#1d4ed8;
+  --green:#16a34a;
+  --red:#dc2626;
+  --orange:#ea580c;
+  --yellow:#ca8a04;
+  --purple:#7c3aed;
+  --shadow:0 8px 30px rgba(15,23,42,.07);
+  --radius:14px;
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:Inter,Arial,sans-serif;
+}
+
+body.dark{
+  --bg:#0b1220;
+  --surface:#111c2e;
+  --surface2:#162235;
+  --text:#f8fafc;
+  --muted:#94a3b8;
+  --border:#26364d;
+  --shadow:0 8px 30px rgba(0,0,0,.25);
+}
+
+button,input,select,textarea{
+  font:inherit;
+}
+
+button{cursor:pointer}
+
+.app{
+  min-height:100vh;
+  display:flex;
+}
+
+.sidebar{
+  position:fixed;
+  left:0;
+  top:0;
+  bottom:0;
+  width:240px;
+  background:var(--surface);
+  border-right:1px solid var(--border);
+  padding:20px 14px;
+  z-index:20;
+}
+
+.logo{
+  font-size:20px;
+  font-weight:800;
+  padding:12px;
+  margin-bottom:20px;
+}
+
+.logo span{
+  color:var(--primary);
+}
+
+.nav{
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+}
+
+.nav button{
+  width:100%;
+  border:0;
+  background:transparent;
+  color:var(--muted);
+  text-align:left;
+  padding:12px;
+  border-radius:9px;
+}
+
+.nav button:hover,
+.nav button.active{
+  color:var(--primary);
+  background:rgba(37,99,235,.1);
+}
+
+.sidebar-bottom{
+  position:absolute;
+  bottom:18px;
+  left:14px;
+  right:14px;
+}
+
+.main{
+  margin-left:240px;
+  width:calc(100% - 240px);
+  padding:24px;
+  max-width:1700px;
+}
+
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:15px;
+  margin-bottom:20px;
+}
+
+.title h1{
+  margin:0;
+  font-size:28px;
+}
+
+.title p{
+  margin:5px 0 0;
+  color:var(--muted);
+}
+
+.actions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.btn{
+  border:0;
+  border-radius:9px;
+  padding:10px 14px;
+  font-size:13px;
+}
+
+.primary{
+  background:var(--primary);
+  color:white;
+}
+
+.primary:hover{
+  background:var(--primary-dark);
+}
+
+.secondary{
+  background:var(--surface);
+  color:var(--text);
+  border:1px solid var(--border);
+}
+
+.danger{
+  background:var(--red);
+  color:white;
+}
+
+.card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:18px;
+}
+
+.section{
+  margin-bottom:18px;
+}
+
+.section-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  margin-bottom:14px;
+}
+
+.section-head h2{
+  font-size:17px;
+  margin:0;
+}
+
+.muted{
+  color:var(--muted);
+}
+
+input,select,textarea{
+  background:var(--surface);
+  color:var(--text);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:10px;
+  outline:none;
+}
+
+input:focus,
+select:focus,
+textarea:focus{
+  border-color:var(--primary);
+}
+
+textarea{
+  width:100%;
+  min-height:120px;
+  resize:vertical;
+}
+
+label{
+  display:block;
+  font-size:11px;
+  font-weight:700;
+  color:var(--muted);
+  margin-bottom:6px;
+}
+
+.datebar{
+  display:flex;
+  align-items:end;
+  gap:10px;
+  margin-bottom:18px;
+  flex-wrap:wrap;
+}
+
+.date-field{
+  min-width:160px;
+}
+
+.goal-field{
+  flex:1;
+  min-width:250px;
+}
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:12px;
+  margin-bottom:18px;
+}
+
+.stat{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:15px;
+}
+
+.stat-icon{
+  font-size:20px;
+}
+
+.stat-value{
+  font-size:23px;
+  font-weight:800;
+  margin-top:7px;
+}
+
+.stat-label{
+  color:var(--muted);
+  font-size:11px;
+  margin-top:3px;
+}
+
+.dashboard{
+  display:grid;
+  grid-template-columns:minmax(0,1.7fr) minmax(280px,.8fr);
+  gap:18px;
+}
+
+.goal-grid{
+  display:grid;
+  grid-template-columns:1fr 120px;
+  align-items:center;
+  gap:20px;
+}
+
+.circle{
+  width:115px;
+  height:115px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  background:conic-gradient(var(--primary) 0deg,var(--border) 0deg);
+}
+
+.circle-inner{
+  width:88px;
+  height:88px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  background:var(--surface);
+  font-size:21px;
+  font-weight:800;
+}
+
+.progress{
+  height:9px;
+  border-radius:20px;
+  background:var(--border);
+  overflow:hidden;
+}
+
+.progress-fill{
+  height:100%;
+  background:var(--primary);
+  width:0;
+  transition:.3s;
+}
+
+.toolbar{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-bottom:14px;
+}
+
+.search{
+  flex:1;
+  min-width:180px;
+}
+
+.task-list{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+.task{
+  border:1px solid var(--border);
+  border-radius:11px;
+  padding:12px;
+  display:grid;
+  grid-template-columns:30px 30px minmax(0,1fr) 85px 90px auto;
+  gap:10px;
+  align-items:center;
+  background:var(--surface);
+}
+
+.task:hover{
+  border-color:var(--primary);
+}
+
+.task.running{
+  box-shadow:0 0 0 2px rgba(37,99,235,.15);
+  border-color:var(--primary);
+}
+
+.task.completed{
+  opacity:.58;
+}
+
+.task.completed .task-name{
+  text-decoration:line-through;
+}
+
+.drag{
+  color:var(--muted);
+  cursor:grab;
+  font-size:17px;
+}
+
+.task-name{
+  font-weight:700;
+  font-size:14px;
+}
+
+.task-sub{
+  color:var(--muted);
+  font-size:11px;
+  margin-top:4px;
+}
+
+.timer{
+  font-family:monospace;
+  font-weight:700;
+  color:var(--primary);
+}
+
+.task-buttons{
+  display:flex;
+  gap:5px;
+}
+
+.icon-btn{
+  border:1px solid var(--border);
+  background:var(--surface);
+  color:var(--text);
+  border-radius:7px;
+  padding:7px 8px;
+}
+
+.icon-btn:hover{
+  border-color:var(--primary);
+}
+
+.pin.active{
+  color:var(--yellow);
+}
+
+.badge{
+  display:inline-block;
+  border-radius:20px;
+  padding:4px 8px;
+  font-size:10px;
+  font-weight:700;
+  white-space:nowrap;
+}
+
+.high{
+  color:var(--red);
+  background:rgba(220,38,38,.1);
+}
+
+.medium{
+  color:var(--yellow);
+  background:rgba(202,138,4,.1);
+}
+
+.low{
+  color:var(--green);
+  background:rgba(22,163,74,.1);
+}
+
+.category{
+  color:var(--purple);
+  background:rgba(124,58,237,.1);
+}
+
+.overdue{
+  color:var(--red);
+  background:rgba(220,38,38,.1);
+}
+
+.timeline{
+  position:relative;
+}
+
+.timeline:before{
+  content:"";
+  position:absolute;
+  left:67px;
+  top:5px;
+  bottom:5px;
+  width:2px;
+  background:var(--border);
+}
+
+.timeline-item{
+  display:grid;
+  grid-template-columns:55px 25px 1fr;
+  gap:12px;
+  margin-bottom:12px;
+}
+
+.timeline-time{
+  text-align:right;
+  color:var(--muted);
+  font-size:11px;
+  padding-top:9px;
+}
+
+.timeline-dot{
+  width:11px;
+  height:11px;
+  border-radius:50%;
+  margin-top:10px;
+  z-index:2;
+}
+
+.timeline-card{
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:10px;
+}
+
+.timeline-meta{
+  display:flex;
+  gap:6px;
+  margin-top:6px;
+  flex-wrap:wrap;
+}
+
+.metric{
+  margin-bottom:15px;
+}
+
+.metric-row{
+  display:flex;
+  justify-content:space-between;
+  font-size:12px;
+  margin-bottom:6px;
+}
+
+.chart{
+  height:190px;
+  display:flex;
+  align-items:end;
+  gap:8px;
+  padding-top:15px;
+}
+
+.bar-wrap{
+  flex:1;
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  justify-content:end;
+  align-items:center;
+  gap:4px;
+}
+
+.bar{
+  width:min(32px,80%);
+  min-height:3px;
+  background:var(--primary);
+  border-radius:5px 5px 0 0;
+}
+
+.bar-label,
+.bar-value{
+  color:var(--muted);
+  font-size:9px;
+}
+
+.calendar-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:12px;
+}
+
+.calendar-title{
+  font-weight:800;
+}
+
+.calendar-grid{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:4px;
+}
+
+.cal-day-name{
+  text-align:center;
+  color:var(--muted);
+  font-size:10px;
+  padding:6px;
+}
+
+.cal-day{
+  min-height:65px;
+  border:1px solid var(--border);
+  border-radius:7px;
+  padding:6px;
+  cursor:pointer;
+  background:var(--surface);
+}
+
+.cal-day:hover{
+  border-color:var(--primary);
+}
+
+.cal-day.today{
+  box-shadow:inset 0 0 0 2px var(--primary);
+}
+
+.cal-day.selected{
+  background:rgba(37,99,235,.1);
+}
+
+.cal-number{
+  font-size:11px;
+  font-weight:700;
+}
+
+.cal-count{
+  font-size:9px;
+  color:var(--primary);
+  margin-top:7px;
+}
+
+.week-grid{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:5px;
+}
+
+.week-day{
+  min-height:130px;
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:8px;
+}
+
+.week-day-head{
+  font-size:11px;
+  font-weight:700;
+  margin-bottom:8px;
+}
+
+.week-task{
+  font-size:10px;
+  padding:6px;
+  border-radius:6px;
+  background:var(--surface2);
+  margin-bottom:5px;
+}
+
+.notes-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:18px;
+}
+
+.modal{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:100;
+  background:rgba(0,0,0,.55);
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+}
+
+.modal.show{
+  display:flex;
+}
+
+.modal-box{
+  width:100%;
+  max-width:650px;
+  max-height:92vh;
+  overflow:auto;
+  background:var(--surface);
+  color:var(--text);
+  border-radius:15px;
+  padding:22px;
+}
+
+.modal-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:18px;
+}
+
+.modal-header h2{
+  margin:0;
+}
+
+.form-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+.full{
+  grid-column:1/-1;
+}
+
+.form-actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:8px;
+  margin-top:18px;
+}
+
+.break-box{
+  text-align:center;
+}
+
+.break-clock{
+  font-family:monospace;
+  font-size:48px;
+  font-weight:700;
+  margin:18px;
+}
+
+.empty{
+  padding:35px;
+  text-align:center;
+  color:var(--muted);
+  border:1px dashed var(--border);
+  border-radius:10px;
+}
+
+.toast{
+  position:fixed;
+  right:20px;
+  bottom:20px;
+  background:#172033;
+  color:white;
+  padding:12px 16px;
+  border-radius:9px;
+  opacity:0;
+  transform:translateY(15px);
+  pointer-events:none;
+  transition:.25s;
+  z-index:200;
+  font-size:13px;
+}
+
+.toast.show{
+  opacity:1;
+  transform:translateY(0);
+}
+
+/* AUTH */
+
+.auth-overlay{
+  position:fixed;
+  inset:0;
+  z-index:1000;
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(37,99,235,.22),
+      transparent 35%
+    ),
+    var(--bg);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+}
+
+.auth-overlay.hidden{
+  display:none;
+}
+
+.auth-card{
+  width:100%;
+  max-width:430px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:20px;
+  box-shadow:0 25px 70px rgba(15,23,42,.15);
+  padding:30px;
+}
+
+.auth-logo{
+  text-align:center;
+  font-size:28px;
+  font-weight:900;
+  margin-bottom:8px;
+}
+
+.auth-logo span{
+  color:var(--primary);
+}
+
+.auth-subtitle{
+  text-align:center;
+  color:var(--muted);
+  margin-bottom:24px;
+  font-size:13px;
+}
+
+.auth-form{
+  display:grid;
+  gap:13px;
+}
+
+.auth-form input{
+  width:100%;
+}
+
+.auth-message{
+  min-height:20px;
+  font-size:12px;
+  text-align:center;
+  margin-top:12px;
+}
+
+.auth-message.error{
+  color:var(--red);
+}
+
+.auth-message.success{
+  color:var(--green);
+}
+
+.auth-switch{
+  text-align:center;
+  margin-top:18px;
+  color:var(--muted);
+  font-size:12px;
+}
+
+.auth-switch button{
+  border:0;
+  background:none;
+  color:var(--primary);
+  font-weight:700;
+}
+
+.user-pill{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:7px 10px;
+  font-size:11px;
+  color:var(--muted);
+}
+
+.sync-dot{
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:var(--green);
+}
+
+.sync-dot.offline{
+  background:var(--orange);
+}
+
+@media(max-width:1200px){
+  .stats{
+    grid-template-columns:repeat(3,1fr);
+  }
+}
+
+@media(max-width:950px){
+  .dashboard{
+    grid-template-columns:1fr;
+  }
+}
+
+@media(max-width:750px){
+
+  .sidebar{
+    width:62px;
+    padding:15px 7px;
+  }
+
+  .logo{
+    font-size:0;
+    text-align:center;
+  }
+
+  .logo span{
+    display:none;
+  }
+
+  .logo:before{
+    content:"📋";
+    font-size:23px;
+  }
+
+  .nav button{
+    text-align:center;
+    font-size:0;
+  }
+
+  .nav button::first-letter{
+    font-size:19px;
+  }
+
+  .sidebar-bottom{
+    display:none;
+  }
+
+  .main{
+    margin-left:62px;
+    width:calc(100% - 62px);
+    padding:12px;
+  }
+
+  .topbar{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+
+  .stats{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .goal-grid{
+    grid-template-columns:1fr;
+  }
+
+  .circle{
+    margin:auto;
+  }
+
+  .task{
+    grid-template-columns:25px 30px 1fr;
+  }
+
+  .task > *{
+    grid-column:3;
+  }
+
+  .task .drag{
+    grid-column:1;
+    grid-row:1;
+  }
+
+  .task .task-check{
+    grid-column:2;
+    grid-row:1;
+  }
+
+  .task .badge{
+    grid-column:3;
+  }
+
+  .task .timer{
+    grid-column:3;
+  }
+
+  .task-buttons{
+    grid-column:3;
+  }
+
+  .notes-grid{
+    grid-template-columns:1fr;
+  }
+
+  .week-grid{
+    overflow-x:auto;
+    grid-template-columns:repeat(7,120px);
+  }
+
+  .form-grid{
+    grid-template-columns:1fr;
+  }
+
+  .full{
+    grid-column:auto;
+  }
+
+  .user-pill{
+    max-width:100%;
+  }
+}
+
+@media print{
+
+  .sidebar,
+  .actions,
+  .toolbar,
+  .task-buttons,
+  .datebar button,
+  .user-pill{
+    display:none!important;
+  }
+
+  .main{
+    margin:0;
+    width:100%;
+    padding:0;
+  }
+
+  body{
+    background:white;
+  }
+
+  .card,.stat{
+    box-shadow:none;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- =====================================================
+     AUTH SCREEN
+===================================================== -->
+
+<div class="auth-overlay" id="authOverlay">
+
+  <div class="auth-card">
+
+    <div class="auth-logo">
+      <span>Daily</span> Planner
+    </div>
+
+    <div class="auth-subtitle" id="authSubtitle">
+      Sign in to sync your planner across all devices.
+    </div>
+
+    <form class="auth-form" id="authForm">
+
+      <div>
+        <label>Email</label>
+        <input
+          type="email"
+          id="authEmail"
+          placeholder="you@example.com"
+          autocomplete="email"
+          required
+        >
+      </div>
+
+      <div>
+        <label>Password</label>
+        <input
+          type="password"
+          id="authPassword"
+          placeholder="Minimum 6 characters"
+          autocomplete="current-password"
+          minlength="6"
+          required
+        >
+      </div>
+
+      <div id="confirmPasswordWrap" style="display:none">
+        <label>Confirm password</label>
+        <input
+          type="password"
+          id="authConfirmPassword"
+          placeholder="Repeat password"
+          autocomplete="new-password"
+          minlength="6"
+        >
+      </div>
+
+      <button
+        class="btn primary"
+        type="submit"
+        id="authSubmit"
+      >
+        Sign In
+      </button>
+
+    </form>
+
+    <div
+      class="auth-message"
+      id="authMessage"
+    ></div>
+
+    <div class="auth-switch">
+
+      <span id="authSwitchText">
+        Don't have an account?
+      </span>
+
+      <button
+        type="button"
+        onclick="toggleAuthMode()"
+        id="authSwitchButton"
+      >
+        Create account
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<div class="app">
+
+<aside class="sidebar">
+
+  <div class="logo">
+    <span>Daily</span> Planner
+  </div>
+
+  <nav class="nav">
+
+    <button class="active" onclick="showSection('dashboard')">
+      🏠 Dashboard
+    </button>
+
+    <button onclick="scrollToId('taskSection')">
+      ✓ Tasks
+    </button>
+
+    <button onclick="scrollToId('calendarSection')">
+      🗓️ Calendar
+    </button>
+
+    <button onclick="scrollToId('weekSection')">
+      📅 Week
+    </button>
+
+    <button onclick="scrollToId('analyticsSection')">
+      📊 Analytics
+    </button>
+
+    <button onclick="openBreakModal()">
+      ☕ Break
+    </button>
+
+  </nav>
+
+  <div class="sidebar-bottom">
+
+    <button
+      class="btn secondary"
+      style="width:100%;margin-bottom:8px"
+      onclick="toggleTheme()"
+    >
+      🌙 Theme
+    </button>
+
+    <button
+      class="btn danger"
+      style="width:100%"
+      onclick="logout()"
+    >
+      ↪ Logout
+    </button>
+
+  </div>
+
+</aside>
+
+
+<main class="main">
+
+  <div class="topbar">
+
+    <div class="title">
+
+      <h1 id="greeting">
+        Good Morning 👋
+      </h1>
+
+      <p id="dateText"></p>
+
+    </div>
+
+    <div class="actions">
+
+      <div class="user-pill">
+
+        <span
+          class="sync-dot"
+          id="syncDot"
+        ></span>
+
+        <span id="userEmail">
+          Connecting...
+        </span>
+
+      </div>
+
+      <button
+        class="btn secondary"
+        onclick="exportJSON()"
+      >
+        💾 Backup
+      </button>
+
+      <button
+        class="btn secondary"
+        onclick="document.getElementById('importFile').click()"
+      >
+        📥 Restore
+      </button>
+
+      <input
+        id="importFile"
+        type="file"
+        accept=".json"
+        hidden
+        onchange="importJSON(event)"
+      >
+
+      <button
+        class="btn secondary"
+        onclick="exportCSV()"
+      >
+        📤 CSV
+      </button>
+
+      <button
+        class="btn secondary"
+        onclick="window.print()"
+      >
+        🖨️ Print
+      </button>
+
+      <button
+        class="btn primary"
+        onclick="openTaskModal()"
+      >
+        + New Task
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <div class="datebar">
+
+    <div class="date-field">
+
+      <label>DATE</label>
+
+      <input
+        type="date"
+        id="selectedDate"
+        onchange="changeDate()"
+      >
+
+    </div>
+
+    <div class="goal-field">
+
+      <label>TODAY'S MAIN GOAL</label>
+
+      <input
+        id="dailyGoal"
+        placeholder="What is the most important result you want today?"
+        oninput="saveCurrentDay()"
+      >
+
+    </div>
+
+    <button
+      class="btn secondary"
+      onclick="goToday()"
+    >
+      Today
+    </button>
+
+  </div>
+
+
+  <div class="stats">
+
+    <div class="stat">
+      <div class="stat-icon">🎯</div>
+      <div class="stat-value" id="score">0%</div>
+      <div class="stat-label">Productivity Score</div>
+    </div>
+
+    <div class="stat">
+      <div class="stat-icon">✓</div>
+      <div class="stat-value" id="taskCount">0/0</div>
+      <div class="stat-label">Completed</div>
+    </div>
+
+    <div class="stat">
+      <div class="stat-icon">⏱️</div>
+      <div class="stat-value" id="planned">0m</div>
+      <div class="stat-label">Planned Time</div>
+    </div>
+
+    <div class="stat">
+      <div class="stat-icon">▶️</div>
+      <div class="stat-value" id="actual">0m</div>
+      <div class="stat-label">Actual Time</div>
+    </div>
+
+    <div class="stat">
+      <div class="stat-icon">🚨</div>
+      <div class="stat-value" id="overdue">0</div>
+      <div class="stat-label">Overdue</div>
+    </div>
+
+    <div class="stat">
+      <div class="stat-icon">🔥</div>
+      <div class="stat-value" id="streak">0</div>
+      <div class="stat-label">Streak</div>
+    </div>
+
+  </div>
+
+
+  <div class="dashboard">
+
+    <div>
+
+      <section class="card section">
+
+        <div class="section-head">
+          <h2>🎯 Today's Focus</h2>
+          <span class="muted" id="goalStatus">
+            Not started
+          </span>
+        </div>
+
+        <div class="goal-grid">
+
+          <div>
+
+            <h3 id="goalDisplay">
+              Set your main goal above.
+            </h3>
+
+            <p class="muted">
+              Complete your highest-value work before
+              spending time on low-priority tasks.
+            </p>
+
+            <div class="progress">
+              <div
+                class="progress-fill"
+                id="goalProgress"
+              ></div>
+            </div>
+
+          </div>
+
+          <div
+            class="circle"
+            id="goalCircle"
+          >
+            <div class="circle-inner">
+              <span id="goalPercent">
+                0%
+              </span>
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <section class="card section">
+
+        <div class="section-head">
+          <h2>🕒 Today's Timeline</h2>
+          <span class="muted" id="timelineCount">
+            0 tasks
+          </span>
+        </div>
+
+        <div id="timeline"></div>
+
+      </section>
+
+
+      <section
+        class="card section"
+        id="taskSection"
+      >
+
+        <div class="section-head">
+
+          <h2>✓ Task Manager</h2>
+
+          <button
+            class="btn primary"
+            onclick="openTaskModal()"
+          >
+            + Add
+          </button>
+
+        </div>
+
+        <div class="toolbar">
+
+          <input
+            class="search"
+            id="search"
+            placeholder="🔍 Search tasks..."
+            oninput="renderTasks()"
+          >
+
+          <select
+            id="priorityFilter"
+            onchange="renderTasks()"
+          >
+            <option value="all">
+              All priorities
+            </option>
+            <option value="High">
+              🔴 High
+            </option>
+            <option value="Medium">
+              🟡 Medium
+            </option>
+            <option value="Low">
+              🟢 Low
+            </option>
+          </select>
+
+          <select
+            id="statusFilter"
+            onchange="renderTasks()"
+          >
+            <option value="all">
+              All status
+            </option>
+            <option value="pending">
+              Pending
+            </option>
+            <option value="running">
+              Running
+            </option>
+            <option value="completed">
+              Completed
+            </option>
+            <option value="overdue">
+              Overdue
+            </option>
+          </select>
+
+          <select
+            id="sortSelect"
+            onchange="renderTasks()"
+          >
+            <option value="order">
+              My Order
+            </option>
+            <option value="time">
+              Time
+            </option>
+            <option value="priority">
+              Priority
+            </option>
+            <option value="name">
+              Name
+            </option>
+          </select>
+
+        </div>
+
+        <div
+          class="task-list"
+          id="taskList"
+        ></div>
+
+      </section>
+
+
+      <section
+        class="card section"
+        id="weekSection"
+      >
+
+        <div class="section-head">
+
+          <h2>📅 Weekly Planner</h2>
+
+          <button
+            class="btn secondary"
+            onclick="changeWeek(-1)"
+          >
+            ←
+          </button>
+
+          <button
+            class="btn secondary"
+            onclick="changeWeek(1)"
+          >
+            →
+          </button>
+
+        </div>
+
+        <div
+          class="week-grid"
+          id="weekGrid"
+        ></div>
+
+      </section>
+
+
+      <div class="notes-grid">
+
+        <section class="card">
+
+          <div class="section-head">
+            <h2>📝 Daily Notes</h2>
+          </div>
+
+          <textarea
+            id="notes"
+            placeholder="Important information, ideas, reminders..."
+            oninput="saveCurrentDay()"
+          ></textarea>
+
+        </section>
+
+        <section class="card">
+
+          <div class="section-head">
+            <h2>🌙 End-of-Day Review</h2>
+          </div>
+
+          <textarea
+            id="review"
+            placeholder="What did I accomplish? What should I improve tomorrow?"
+            oninput="saveCurrentDay()"
+          ></textarea>
+
+        </section>
+
+      </div>
+
+    </div>
+
+
+    <div>
+
+      <section
+        class="card section"
+        id="calendarSection"
+      >
+
+        <div class="calendar-head">
+
+          <button
+            class="btn secondary"
+            onclick="changeMonth(-1)"
+          >
+            ←
+          </button>
+
+          <div
+            class="calendar-title"
+            id="calendarTitle"
+          ></div>
+
+          <button
+            class="btn secondary"
+            onclick="changeMonth(1)"
+          >
+            →
+          </button>
+
+        </div>
+
+        <div
+          class="calendar-grid"
+          id="calendar"
+        ></div>
+
+      </section>
+
+
+      <section
+        class="card section"
+        id="analyticsSection"
+      >
+
+        <div class="section-head">
+          <h2>📊 Productivity</h2>
+        </div>
+
+        <div class="metric">
+
+          <div class="metric-row">
+            <span>Completion</span>
+            <b id="completionMetric">
+              0%
+            </b>
+          </div>
+
+          <div class="progress">
+            <div
+              class="progress-fill"
+              id="completionBar"
+            ></div>
+          </div>
+
+        </div>
+
+        <div class="metric">
+
+          <div class="metric-row">
+            <span>Time Efficiency</span>
+            <b id="efficiencyMetric">
+              0%
+            </b>
+          </div>
+
+          <div class="progress">
+            <div
+              class="progress-fill"
+              id="efficiencyBar"
+            ></div>
+          </div>
+
+        </div>
+
+        <div class="metric">
+
+          <div class="metric-row">
+            <span>
+              High Priority Completion
+            </span>
+
+            <b id="highMetric">
+              0%
+            </b>
+          </div>
+
+          <div class="progress">
+            <div
+              class="progress-fill"
+              id="highBar"
+            ></div>
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <section class="card section">
+
+        <div class="section-head">
+          <h2>📈 Last 7 Days</h2>
+        </div>
+
+        <div
+          class="chart"
+          id="chart"
+        ></div>
+
+      </section>
+
+
+      <section class="card section">
+
+        <div class="section-head">
+          <h2>🔥 Focus Tasks</h2>
+        </div>
+
+        <div id="focusTasks"></div>
+
+      </section>
+
+
+      <section class="card section">
+
+        <div class="section-head">
+          <h2>⚡ Quick Actions</h2>
+        </div>
+
+        <div style="display:grid;gap:8px">
+
+          <button
+            class="btn primary"
+            onclick="startNextTask()"
+          >
+            ▶ Start Next Task
+          </button>
+
+          <button
+            class="btn secondary"
+            onclick="openBreakModal()"
+          >
+            ☕ Start Break
+          </button>
+
+          <button
+            class="btn secondary"
+            onclick="duplicateLastTask()"
+          >
+            ⧉ Duplicate Last Task
+          </button>
+
+          <button
+            class="btn secondary"
+            onclick="clearCompleted()"
+          >
+            ✓ Clear Completed
+          </button>
+
+        </div>
+
+      </section>
+
+    </div>
+
+  </div>
+
+</main>
+</div>
+
+
+<!-- =====================================================
+     TASK MODAL
+===================================================== -->
+
+<div
+  class="modal"
+  id="taskModal"
+>
+
+  <div class="modal-box">
+
+    <div class="modal-header">
+
+      <h2 id="modalTitle">
+        ➕ New Task
+      </h2>
+
+      <button
+        class="icon-btn"
+        onclick="closeTaskModal()"
+      >
+        ✕
+      </button>
+
+    </div>
+
+    <input
+      type="hidden"
+      id="editId"
+    >
+
+    <div class="form-grid">
+
+      <div>
+        <label>Task name</label>
+        <input
+          id="taskName"
+          placeholder="Example: Complete audit working papers"
+        >
+      </div>
+
+      <div>
+        <label>Category</label>
+
+        <select id="taskCategory">
+
+          <option>Work</option>
+          <option>Audit</option>
+          <option>CA Studies</option>
+          <option>University</option>
+          <option>Meeting</option>
+          <option>Personal</option>
+          <option>Admin</option>
+          <option>Other</option>
+
+        </select>
+
+      </div>
+
+      <div>
+        <label>Start</label>
+        <input
+          type="time"
+          id="taskStart"
+        >
+      </div>
+
+      <div>
+        <label>End</label>
+        <input
+          type="time"
+          id="taskEnd"
+        >
+      </div>
+
+      <div>
+
+        <label>Priority</label>
+
+        <select id="taskPriority">
+
+          <option value="High">
+            🔴 High
+          </option>
+
+          <option
+            value="Medium"
+            selected
+          >
+            🟡 Medium
+          </option>
+
+          <option value="Low">
+            🟢 Low
+          </option>
+
+        </select>
+
+      </div>
+
+      <div>
+
+        <label>Repeat</label>
+
+        <select id="taskRepeat">
+
+          <option value="none">
+            Does not repeat
+          </option>
+
+          <option value="daily">
+            Every day
+          </option>
+
+          <option value="weekdays">
+            Weekdays
+          </option>
+
+          <option value="weekly">
+            Every week
+          </option>
+
+        </select>
+
+      </div>
+
+      <div>
+
+        <label>Reminder</label>
+
+        <select id="taskReminder">
+
+          <option value="none">
+            No reminder
+          </option>
+
+          <option value="5">
+            5 minutes before
+          </option>
+
+          <option value="10">
+            10 minutes before
+          </option>
+
+          <option value="15">
+            15 minutes before
+          </option>
+
+          <option value="30">
+            30 minutes before
+          </option>
+
+        </select>
+
+      </div>
+
+      <div>
+
+        <label>Estimated minutes</label>
+
+        <input
+          type="number"
+          id="taskEstimate"
+          min="0"
+          placeholder="Automatically calculated"
+        >
+
+      </div>
+
+      <div class="full">
+
+        <label>Description</label>
+
+        <textarea
+          id="taskDescription"
+          placeholder="Instructions, expected result, links, details..."
+        ></textarea>
+
+      </div>
+
+    </div>
+
+    <div class="form-actions">
+
+      <button
+        class="btn secondary"
+        onclick="closeTaskModal()"
+      >
+        Cancel
+      </button>
+
+      <button
+        class="btn primary"
+        onclick="saveTaskFromModal()"
+      >
+        Save Task
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- =====================================================
+     BREAK MODAL
+===================================================== -->
+
+<div
+  class="modal"
+  id="breakModal"
+>
+
+  <div class="modal-box break-box">
+
+    <h2>☕ Break Timer</h2>
+
+    <p class="muted">
+      Take a proper break before continuing.
+    </p>
+
+    <div
+      class="break-clock"
+      id="breakClock"
+    >
+      05:00
+    </div>
+
+    <button
+      class="btn primary"
+      onclick="startBreak()"
+    >
+      ▶ Start
+    </button>
+
+    <button
+      class="btn secondary"
+      onclick="resetBreak()"
+    >
+      ↻ Reset
+    </button>
+
+    <button
+      class="btn secondary"
+      onclick="closeBreakModal()"
+    >
+      Close
+    </button>
+
+  </div>
+
+</div>
+
+
+<div
+  class="toast"
+  id="toast"
+></div>
+
+
+<!-- =====================================================
+     FIREBASE
+===================================================== -->
+
+<script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-database-compat.js"></script>
+
+
+<script>
+
+/* =========================================================
+   FIREBASE CONFIG
+========================================================= */
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAzDupzXeiQ1BpTd88GAnQUAXoY94A3bkI",
+  authDomain: "daily-work-planner-cd287.firebaseapp.com",
+  databaseURL: "https://daily-work-planner-cd287-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "daily-work-planner-cd287",
+  storageBucket: "daily-work-planner-cd287.firebasestorage.app",
+  messagingSenderId: "168784225310",
+  appId: "1:168784225310:web:3c0afd3f241a9572f8fa0f"
+};
+
+
+/* =========================================================
+   FIREBASE INITIALIZE
+========================================================= */
+
+firebase.initializeApp(firebaseConfig);
+
+const firebaseAuth =
+  firebase.auth();
+
+const firebaseDB =
+  firebase.database();
+
+
+/* =========================================================
+   GLOBAL STATE
+========================================================= */
+
+let firebaseUser = null;
+
+let firebaseReady = false;
+
+let firebaseListenerAttached = false;
+
+let isApplyingRemoteData = false;
+
+let authMode = "login";
+
+let saveTimer = null;
+
+const STORAGE_KEY =
+  "advanced_daily_work_planner_v3";
+
+let appData = {
+  days:{},
+  theme:"light"
+};
+
+let selectedDate =
+  todayKey();
+
+let calendarDate =
+  new Date();
+
+let weekOffset = 0;
+
+let breakInterval = null;
+
+let breakSeconds = 300;
+
+let draggedTaskId = null;
+
+
+/* =========================================================
+   AUTH UI
+========================================================= */
+
+function toggleAuthMode(){
+
+  authMode =
+    authMode==="login"
+    ? "register"
+    : "login";
+
+  const isRegister =
+    authMode==="register";
+
+  document.getElementById(
+    "authSubtitle"
+  ).textContent =
+    isRegister
+    ? "Create an account to sync your planner across all devices."
+    : "Sign in to sync your planner across all devices.";
+
+  document.getElementById(
+    "authSubmit"
+  ).textContent =
+    isRegister
+    ? "Create Account"
+    : "Sign In";
+
+  document.getElementById(
+    "confirmPasswordWrap"
+  ).style.display =
+    isRegister
+    ? "block"
+    : "none";
+
+  document.getElementById(
+    "authSwitchText"
+  ).textContent =
+    isRegister
+    ? "Already have an account?"
+    : "Don't have an account?";
+
+  document.getElementById(
+    "authSwitchButton"
+  ).textContent =
+    isRegister
+    ? "Sign in"
+    : "Create account";
+
+  clearAuthMessage();
+
+}
+
+
+function showAuthMessage(
+  message,
+  type="error"
+){
+
+  const box =
+    document.getElementById(
+      "authMessage"
+    );
+
+  box.textContent =
+    message;
+
+  box.className =
+    "auth-message " +
+    type;
+
+}
+
+
+function clearAuthMessage(){
+
+  const box =
+    document.getElementById(
+      "authMessage"
+    );
+
+  box.textContent="";
+
+  box.className =
+    "auth-message";
+
+}
+
+
+/* =========================================================
+   AUTH FORM
+========================================================= */
+
+document.getElementById(
+  "authForm"
+).addEventListener(
+  "submit",
+  async event=>{
+
+    event.preventDefault();
+
+    const email =
+      document.getElementById(
+        "authEmail"
+      ).value.trim();
+
+    const password =
+      document.getElementById(
+        "authPassword"
+      ).value;
+
+    const submit =
+      document.getElementById(
+        "authSubmit"
+      );
+
+    submit.disabled=true;
+
+    clearAuthMessage();
+
+
+    try{
+
+      if(authMode==="register"){
+
+        const confirm =
+          document.getElementById(
+            "authConfirmPassword"
+          ).value;
+
+        if(password.length<6){
+
+          throw new Error(
+            "Password must be at least 6 characters."
+          );
+
+        }
+
+        if(password!==confirm){
+
+          throw new Error(
+            "Passwords do not match."
+          );
+
+        }
+
+        await firebaseAuth
+          .createUserWithEmailAndPassword(
+            email,
+            password
+          );
+
+        showAuthMessage(
+          "Account created successfully.",
+          "success"
+        );
+
+      }else{
+
+        await firebaseAuth
+          .signInWithEmailAndPassword(
+            email,
+            password
+          );
+
+      }
+
+    }catch(error){
+
+      console.error(error);
+
+      showAuthMessage(
+        firebaseErrorMessage(error)
+      );
+
+    }finally{
+
+      submit.disabled=false;
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   FIREBASE ERROR MESSAGES
+========================================================= */
+
+function firebaseErrorMessage(error){
+
+  const code =
+    error &&
+    error.code
+      ? error.code
+      : "";
+
+  const map = {
+
+    "auth/email-already-in-use":
+      "This email already has an account.",
+
+    "auth/invalid-email":
+      "Please enter a valid email address.",
+
+    "auth/weak-password":
+      "Password is too weak. Use at least 6 characters.",
+
+    "auth/user-not-found":
+      "No account was found with this email.",
+
+    "auth/wrong-password":
+      "Incorrect password.",
+
+    "auth/invalid-credential":
+      "Email or password is incorrect.",
+
+    "auth/too-many-requests":
+      "Too many attempts. Please try again later.",
+
+    "auth/network-request-failed":
+      "Network error. Check your internet connection."
+
+  };
+
+  return (
+    map[code] ||
+    error.message ||
+    "Authentication failed."
+  );
+
+}
+
+
+/* =========================================================
+   AUTH STATE
+========================================================= */
+
+firebaseAuth.onAuthStateChanged(
+  async user=>{
+
+    if(user){
+
+      firebaseUser =
+        user;
+
+      firebaseReady =
+        true;
+
+      document.getElementById(
+        "authOverlay"
+      ).classList.add(
+        "hidden"
+      );
+
+      document.getElementById(
+        "userEmail"
+      ).textContent =
+        user.email ||
+        "Signed in";
+
+      setSyncStatus(
+        true
+      );
+
+      await initializeUserData();
+
+    }else{
+
+      firebaseUser =
+        null;
+
+      firebaseReady =
+        false;
+
+      document.getElementById(
+        "authOverlay"
+      ).classList.remove(
+        "hidden"
+      );
+
+      document.getElementById(
+        "userEmail"
+      ).textContent =
+        "Not signed in";
+
+      setSyncStatus(
+        false
+      );
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   LOGOUT
+========================================================= */
+
+async function logout(){
+
+  try{
+
+    await saveToFirebase();
+
+    await firebaseAuth.signOut();
+
+    showToast(
+      "Logged out."
+    );
+
+  }catch(error){
+
+    console.error(
+      "Logout error:",
+      error
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   FIREBASE USER REFERENCE
+========================================================= */
+
+function firebaseUserRef(){
+
+  if(!firebaseUser)
+    return null;
+
+  return firebaseDB.ref(
+    "users/" +
+    firebaseUser.uid
+  );
+
+}
+
+
+/* =========================================================
+   INITIALIZE USER DATA
+========================================================= */
+
+async function initializeUserData(){
+
+  loadLocalData();
+
+  try{
+
+    const snapshot =
+      await firebaseUserRef()
+        .once("value");
+
+    const cloudData =
+      snapshot.val();
+
+
+    if(cloudData){
+
+      /*
+        Firebase is the source of truth
+        once the user is logged in.
+      */
+
+      appData = normalizeAppData(
+        cloudData
+      );
+
+      saveLocalOnly();
+
+      showToast(
+        "☁️ Planner synced"
+      );
+
+    }else{
+
+      /*
+        First login on this account.
+
+        If local data exists, upload it.
+      */
+
+      appData =
+        normalizeAppData(
+          appData
+        );
+
+      await saveToFirebase();
+
+      showToast(
+        "☁️ Planner cloud backup created"
+      );
+
+    }
+
+
+    attachFirebaseListener();
+
+    applyTheme();
+
+    loadCurrentDay();
+
+    renderEverything();
+
+
+  }catch(error){
+
+    console.error(
+      "Firebase initialization error:",
+      error
+    );
+
+    setSyncStatus(false);
+
+    /*
+      Continue with local data.
+    */
+
+    applyTheme();
+
+    loadCurrentDay();
+
+    renderEverything();
+
+    showToast(
+      "Offline mode: local data is being used."
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   FIREBASE REALTIME LISTENER
+========================================================= */
+
+function attachFirebaseListener(){
+
+  if(
+    firebaseListenerAttached ||
+    !firebaseUser
+  )
+    return;
+
+  const ref =
+    firebaseUserRef();
+
+  if(!ref)
+    return;
+
+
+  ref.on(
+    "value",
+    snapshot=>{
+
+      if(isApplyingRemoteData)
+        return;
+
+      const cloudData =
+        snapshot.val();
+
+      if(!cloudData)
+        return;
+
+
+      appData =
+        normalizeAppData(
+          cloudData
+        );
+
+      saveLocalOnly();
+
+      applyTheme();
+
+      loadCurrentDay();
+
+      renderEverything();
+
+      setSyncStatus(true);
+
+    },
+    error=>{
+
+      console.error(
+        "Realtime listener error:",
+        error
+      );
+
+      setSyncStatus(false);
+
+    }
+  );
+
+
+  firebaseListenerAttached =
+    true;
+
+}
+
+
+/* =========================================================
+   SAVE FIREBASE
+========================================================= */
+
+async function saveToFirebase(){
+
+  if(
+    !firebaseReady ||
+    !firebaseUser ||
+    isApplyingRemoteData
+  )
+    return;
+
+
+  saveLocalOnly();
+
+
+  try{
+
+    isApplyingRemoteData=true;
+
+    await firebaseUserRef().set({
+
+      days:
+        appData.days || {},
+
+      theme:
+        appData.theme || "light",
+
+      version:3,
+
+      updatedAt:
+        firebase.database
+          .ServerValue
+          .TIMESTAMP
+
+    });
+
+    setSyncStatus(true);
+
+  }catch(error){
+
+    console.error(
+      "Firebase save error:",
+      error
+    );
+
+    setSyncStatus(false);
+
+  }finally{
+
+    isApplyingRemoteData=false;
+
+  }
+
+}
+
+
+/* =========================================================
+   SAVE DATA
+========================================================= */
+
+function saveData(){
+
+  saveLocalOnly();
+
+  /*
+    Debounce cloud writes slightly so typing
+    in notes/goal doesn't create hundreds
+    of Firebase writes.
+  */
+
+  clearTimeout(
+    saveTimer
+  );
+
+  saveTimer =
+    setTimeout(
+      ()=>{
+        saveToFirebase();
+      },
+      400
+    );
+
+}
+
+
+/* =========================================================
+   LOCAL STORAGE
+========================================================= */
+
+function loadLocalData(){
+
+  try{
+
+    const raw =
+      localStorage.getItem(
+        STORAGE_KEY
+      );
+
+    if(raw){
+
+      appData =
+        normalizeAppData(
+          JSON.parse(raw)
+        );
+
+    }
+
+  }catch(error){
+
+    console.error(
+      "Local storage load error:",
+      error
+    );
+
+  }
+
+
+  appData =
+    normalizeAppData(
+      appData
+    );
+
+}
+
+
+function saveLocalOnly(){
+
+  try{
+
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify(
+        appData
+      )
+    );
+
+  }catch(error){
+
+    console.error(
+      "Local storage save error:",
+      error
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   NORMALIZE DATA
+========================================================= */
+
+function normalizeAppData(data){
+
+  if(
+    !data ||
+    typeof data!=="object"
+  ){
+
+    return {
+      days:{},
+      theme:"light"
+    };
+
+  }
+
+  if(
+    !data.days ||
+    typeof data.days!=="object"
+  ){
+
+    data.days={};
+
+  }
+
+  if(
+    data.theme!=="dark" &&
+    data.theme!=="light"
+  ){
+
+    data.theme="light";
+
+  }
+
+  Object.keys(
+    data.days
+  ).forEach(
+    date=>{
+
+      if(
+        !data.days[date] ||
+        typeof data.days[date]!=="object"
+      ){
+
+        data.days[date]={
+          goal:"",
+          notes:"",
+          review:"",
+          tasks:[]
+        };
+
+      }
+
+      if(
+        !Array.isArray(
+          data.days[date].tasks
+        )
+      ){
+
+        data.days[date].tasks=[];
+
+      }
+
+    }
+  );
+
+  return data;
+
+}
+
+
+/* =========================================================
+   SYNC STATUS
+========================================================= */
+
+function setSyncStatus(
+  online
+){
+
+  const dot =
+    document.getElementById(
+      "syncDot"
+    );
+
+  if(!dot)
+    return;
+
+  dot.classList.toggle(
+    "offline",
+    !online
+  );
+
+}
+
+
+/* =========================================================
+   DAY DATA
+========================================================= */
+
+function getDay(
+  date=selectedDate
+){
+
+  if(!appData.days[date]){
+
+    appData.days[date]={
+      goal:"",
+      notes:"",
+      review:"",
+      tasks:[]
+    };
+
+  }
+
+  if(
+    !Array.isArray(
+      appData.days[date].tasks
+    )
+  ){
+
+    appData.days[date].tasks=[];
+
+  }
+
+  return appData.days[date];
+
+}
+
+
+function saveCurrentDay(){
+
+  const day =
+    getDay();
+
+  day.goal =
+    document.getElementById(
+      "dailyGoal"
+    ).value;
+
+  day.notes =
+    document.getElementById(
+      "notes"
+    ).value;
+
+  day.review =
+    document.getElementById(
+      "review"
+    ).value;
+
+  saveData();
+
+  updateStats();
+
+}
+
+
+/* =========================================================
+   DATE
+========================================================= */
+
+function todayKey(){
+
+  return formatDate(
+    new Date()
+  );
+
+}
+
+
+function formatDate(d){
+
+  const y =
+    d.getFullYear();
+
+  const m =
+    String(
+      d.getMonth()+1
+    ).padStart(
+      2,
+      "0"
+    );
+
+  const day =
+    String(
+      d.getDate()
+    ).padStart(
+      2,
+      "0"
+    );
+
+  return `${y}-${m}-${day}`;
+
+}
+
+
+function parseDate(key){
+
+  const [
+    y,
+    m,
+    d
+  ] =
+    key.split("-")
+      .map(Number);
+
+  return new Date(
+    y,
+    m-1,
+    d
+  );
+
+}
+
+
+function addDays(
+  key,
+  amount
+){
+
+  const d =
+    parseDate(
+      key
+    );
+
+  d.setDate(
+    d.getDate()+amount
+  );
+
+  return formatDate(d);
+
+}
+
+
+function changeDate(){
+
+  selectedDate =
+    document.getElementById(
+      "selectedDate"
+    ).value;
+
+  stopAllRunningTimers();
+
+  loadCurrentDay();
+
+  renderEverything();
+
+}
+
+
+function goToday(){
+
+  selectedDate =
+    todayKey();
+
+  document.getElementById(
+    "selectedDate"
+  ).value =
+    selectedDate;
+
+  calendarDate =
+    new Date();
+
+  weekOffset=0;
+
+  loadCurrentDay();
+
+  renderEverything();
+
+}
+
+
+/* =========================================================
+   LOAD DAY
+========================================================= */
+
+function loadCurrentDay(){
+
+  const day =
+    getDay();
+
+  document.getElementById(
+    "dailyGoal"
+  ).value =
+    day.goal || "";
+
+  document.getElementById(
+    "notes"
+  ).value =
+    day.notes || "";
+
+  document.getElementById(
+    "review"
+  ).value =
+    day.review || "";
+
+  document.getElementById(
+    "dateText"
+  ).textContent =
+    parseDate(
+      selectedDate
+    ).toLocaleDateString(
+      undefined,
+      {
+        weekday:"long",
+        year:"numeric",
+        month:"long",
+        day:"numeric"
+      }
+    );
+
+}
+
+
+/* =========================================================
+   GREETING
+========================================================= */
+
+function updateGreeting(){
+
+  const h =
+    new Date().getHours();
+
+  let text =
+    "Good Morning 👋";
+
+  if(
+    h>=12 &&
+    h<17
+  ){
+
+    text =
+      "Good Afternoon 👋";
+
+  }
+
+  if(h>=17){
+
+    text =
+      "Good Evening 👋";
+
+  }
+
+  document.getElementById(
+    "greeting"
+  ).textContent =
+    text;
+
+}
+
+
+/* =========================================================
+   TASK MODAL
+========================================================= */
+
+function openTaskModal(
+  id=null
+){
+
+  const modal =
+    document.getElementById(
+      "taskModal"
+    );
+
+  const title =
+    document.getElementById(
+      "modalTitle"
+    );
+
+  clearTaskForm();
+
+
+  if(id){
+
+    const task =
+      getDay()
+        .tasks
+        .find(
+          t =>
+            String(t.id) ===
+            String(id)
+        );
+
+    if(!task)
+      return;
+
+    title.textContent =
+      "✏️ Edit Task";
+
+    document.getElementById(
+      "editId"
+    ).value =
+      task.id;
+
+    document.getElementById(
+      "taskName"
+    ).value =
+      task.name || "";
+
+    document.getElementById(
+      "taskCategory"
+    ).value =
+      task.category || "Work";
+
+    document.getElementById(
+      "taskStart"
+    ).value =
+      task.start || "";
+
+    document.getElementById(
+      "taskEnd"
+    ).value =
+      task.end || "";
+
+    document.getElementById(
+      "taskPriority"
+    ).value =
+      task.priority || "Medium";
+
+    document.getElementById(
+      "taskRepeat"
+    ).value =
+      task.repeat || "none";
+
+    document.getElementById(
+      "taskReminder"
+    ).value =
+      task.reminder || "none";
+
+    document.getElementById(
+      "taskEstimate"
+    ).value =
+      task.estimate || "";
+
+    document.getElementById(
+      "taskDescription"
+    ).value =
+      task.description || "";
+
+  }else{
+
+    title.textContent =
+      "➕ New Task";
+
+  }
+
+
+  modal.classList.add(
+    "show"
+  );
+
+  setTimeout(
+    ()=>{
+      document.getElementById(
+        "taskName"
+      ).focus();
+    },
+    50
+  );
+
+}
+
+
+function closeTaskModal(){
+
+  document.getElementById(
+    "taskModal"
+  ).classList.remove(
+    "show"
+  );
+
+}
+
+
+function clearTaskForm(){
+
+  document.getElementById(
+    "editId"
+  ).value="";
+
+  document.getElementById(
+    "taskName"
+  ).value="";
+
+  document.getElementById(
+    "taskCategory"
+  ).value="Work";
+
+  document.getElementById(
+    "taskStart"
+  ).value="";
+
+  document.getElementById(
+    "taskEnd"
+  ).value="";
+
+  document.getElementById(
+    "taskPriority"
+  ).value="Medium";
+
+  document.getElementById(
+    "taskRepeat"
+  ).value="none";
+
+  document.getElementById(
+    "taskReminder"
+  ).value="none";
+
+  document.getElementById(
+    "taskEstimate"
+  ).value="";
+
+  document.getElementById(
+    "taskDescription"
+  ).value="";
+
+}
+
+
+/* =========================================================
+   SAVE TASK
+========================================================= */
+
+function saveTaskFromModal(){
+
+  const name =
+    document.getElementById(
+      "taskName"
+    ).value.trim();
+
+  if(!name){
+
+    showToast(
+      "Please enter a task name."
+    );
+
+    return;
+
+  }
+
+
+  const day =
+    getDay();
+
+  const editId =
+    document.getElementById(
+      "editId"
+    ).value;
+
+
+  let estimate =
+    Number(
+      document.getElementById(
+        "taskEstimate"
+      ).value
+    ) || 0;
+
+
+  const start =
+    document.getElementById(
+      "taskStart"
+    ).value;
+
+  const end =
+    document.getElementById(
+      "taskEnd"
+    ).value;
+
+
+  if(
+    !estimate &&
+    start &&
+    end
+  ){
+
+    estimate =
+      getMinutes(
+        start,
+        end
+      );
+
+  }
+
+
+  if(editId){
+
+    const task =
+      day.tasks.find(
+        t =>
+          String(t.id) ===
+          String(editId)
+      );
+
+    if(task){
+
+      task.name =
+        name;
+
+      task.category =
+        document.getElementById(
+          "taskCategory"
+        ).value;
+
+      task.start =
+        start;
+
+      task.end =
+        end;
+
+      task.priority =
+        document.getElementById(
+          "taskPriority"
+        ).value;
+
+      task.repeat =
+        document.getElementById(
+          "taskRepeat"
+        ).value;
+
+      task.reminder =
+        document.getElementById(
+          "taskReminder"
+        ).value;
+
+      task.estimate =
+        estimate;
+
+      task.description =
+        document.getElementById(
+          "taskDescription"
+        ).value;
+
+    }
+
+    showToast(
+      "Task updated."
+    );
+
+  }else{
+
+    const task = {
+
+      id:
+        Date.now() +
+        Math.random(),
+
+      name:name,
+
+      category:
+        document.getElementById(
+          "taskCategory"
+        ).value,
+
+      start:start,
+
+      end:end,
+
+      priority:
+        document.getElementById(
+          "taskPriority"
+        ).value,
+
+      repeat:
+        document.getElementById(
+          "taskRepeat"
+        ).value,
+
+      reminder:
+        document.getElementById(
+          "taskReminder"
+        ).value,
+
+      estimate:
+        estimate,
+
+      description:
+        document.getElementById(
+          "taskDescription"
+        ).value,
+
+      completed:false,
+
+      running:false,
+
+      pinned:false,
+
+      actual:0,
+
+      startedAt:null,
+
+      reminded:false,
+
+      order:
+        day.tasks.length
+
+    };
+
+
+    day.tasks.push(
+      task
+    );
+
+    createRecurringCopies(
+      task
+    );
+
+    showToast(
+      "Task created."
+    );
+
+  }
+
+
+  saveData();
+
+  closeTaskModal();
+
+  renderEverything();
+
+}
+
+
+/* =========================================================
+   RECURRING TASKS
+========================================================= */
+
+function createRecurringCopies(
+  task
+){
+
+  if(
+    task.repeat==="none"
+  )
+    return;
+
+  const count =
+    task.repeat==="weekly"
+    ? 4
+    : 6;
+
+
+  for(
+    let i=1;
+    i<=count;
+    i++
+  ){
+
+    let date;
+
+
+    if(
+      task.repeat==="daily"
+    ){
+
+      date =
+        addDays(
+          selectedDate,
+          i
+        );
+
+    }else if(
+      task.repeat==="weekdays"
+    ){
+
+      date =
+        selectedDate;
+
+      let added=0;
+
+      while(
+        added<i
+      ){
+
+        date =
+          addDays(
+            date,
+            1
+          );
+
+        const d =
+          parseDate(
+            date
+          ).getDay();
+
+        if(
+          d!==0 &&
+          d!==6
+        ){
+
+          added++;
+
+        }
+
+      }
+
+    }else if(
+      task.repeat==="weekly"
+    ){
+
+      date =
+        addDays(
+          selectedDate,
+          i*7
+        );
+
+    }
+
+
+    const day =
+      getDay(date);
+
+
+    const exists =
+      day.tasks.some(
+        t =>
+          t.recurringFrom ===
+          task.id
+      );
+
+
+    if(exists)
+      continue;
+
+
+    day.tasks.push({
+
+      ...JSON.parse(
+        JSON.stringify(task)
+      ),
+
+      id:
+        Date.now() +
+        Math.random() +
+        i,
+
+      completed:false,
+
+      running:false,
+
+      actual:0,
+
+      startedAt:null,
+
+      reminded:false,
+
+      order:
+        day.tasks.length,
+
+      recurringFrom:
+        task.id
+
+    });
+
+  }
+
+}
+
+
+/* =========================================================
+   TASK RENDER
+========================================================= */
+
+function renderTasks(){
+
+  const day =
+    getDay();
+
+  let tasks =
+    [...day.tasks];
+
+
+  const search =
+    document.getElementById(
+      "search"
+    ).value.toLowerCase();
+
+
+  const priority =
+    document.getElementById(
+      "priorityFilter"
+    ).value;
+
+
+  const status =
+    document.getElementById(
+      "statusFilter"
+    ).value;
+
+
+  const sort =
+    document.getElementById(
+      "sortSelect"
+    ).value;
+
+
+  tasks =
+    tasks.filter(
+      t=>{
+
+        const text =
+          `${t.name || ""} ${
+            t.category || ""
+          } ${
+            t.description || ""
+          }`.toLowerCase();
+
+
+        if(
+          search &&
+          !text.includes(search)
+        )
+          return false;
+
+
+        if(
+          priority!=="all" &&
+          t.priority!==priority
+        )
+          return false;
+
+
+        if(
+          status==="completed" &&
+          !t.completed
+        )
+          return false;
+
+
+        if(
+          status==="running" &&
+          !t.running
+        )
+          return false;
+
+
+        if(
+          status==="pending" &&
+          (
+            t.completed ||
+            t.running
+          )
+        )
+          return false;
+
+
+        if(
+          status==="overdue" &&
+          !isOverdue(t)
+        )
+          return false;
+
+
+        return true;
+
+      }
+    );
+
+
+  if(sort==="time"){
+
+    tasks.sort(
+      (a,b)=>
+        (a.start||"99:99")
+        .localeCompare(
+          b.start||"99:99"
+        )
+    );
+
+  }else if(
+    sort==="priority"
+  ){
+
+    const p = {
+      High:0,
+      Medium:1,
+      Low:2
+    };
+
+    tasks.sort(
+      (a,b)=>
+        (p[a.priority] ?? 9) -
+        (p[b.priority] ?? 9)
+    );
+
+  }else if(
+    sort==="name"
+  ){
+
+    tasks.sort(
+      (a,b)=>
+        (a.name||"")
+        .localeCompare(
+          b.name||""
+        )
+    );
+
+  }else{
+
+    tasks.sort(
+      (a,b)=>{
+
+        if(
+          a.pinned!==b.pinned
+        ){
+
+          return a.pinned
+            ? -1
+            : 1;
+
+        }
+
+        return (
+          a.order||0
+        ) -
+        (
+          b.order||0
+        );
+
+      }
+    );
+
+  }
+
+
+  const list =
+    document.getElementById(
+      "taskList"
+    );
+
+
+  if(!tasks.length){
+
+    list.innerHTML = `
+
+      <div class="empty">
+
+        <div style="font-size:30px">
+          📋
+        </div>
+
+        <p>
+          No tasks match your filters.
+        </p>
+
+        <button
+          class="btn primary"
+          onclick="openTaskModal()"
+        >
+          + Create Task
+        </button>
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+  list.innerHTML =
+    tasks.map(
+      t=>{
+
+        const overdue =
+          isOverdue(t);
+
+
+        return `
+
+        <div
+          class="task
+          ${t.completed?"completed":""}
+          ${t.running?"running":""}"
+          draggable="true"
+          ondragstart="dragStart(event,${t.id})"
+          ondragover="dragOver(event)"
+          ondrop="dropTask(event,${t.id})"
+        >
+
+          <div class="drag">
+            ☷
+          </div>
+
+          <input
+            class="task-check"
+            type="checkbox"
+            ${t.completed?"checked":""}
+            onchange="toggleComplete(${t.id})"
+          >
+
+          <div>
+
+            <div class="task-name">
+              ${escapeHTML(t.name)}
+            </div>
+
+            <div class="task-sub">
+
+              <span class="badge category">
+                ${escapeHTML(t.category || "Work")}
+              </span>
+
+              ${
+                t.start
+                ?
+                ` ${escapeHTML(t.start)}${
+                  t.end
+                  ?
+                  " – " +
+                  escapeHTML(t.end)
+                  :
+                  ""
+                }`
+                :
+                ""
+              }
+
+              ${
+                t.repeat &&
+                t.repeat!=="none"
+                ?
+                ` • 🔁 ${escapeHTML(t.repeat)}`
+                :
+                ""
+              }
+
+              ${
+                overdue
+                ?
+                ` <span class="badge overdue">
+                    OVERDUE
+                  </span>`
+                :
+                ""
+              }
+
+            </div>
+
+          </div>
+
+          <span class="badge ${
+            String(
+              t.priority ||
+              "Medium"
+            ).toLowerCase()
+          }">
+            ${escapeHTML(
+              t.priority ||
+              "Medium"
+            )}
+          </span>
+
+          <div class="timer">
+
+            ${
+              t.running
+              ?
+              formatSeconds(
+                getCurrentActual(t)
+              )
+              :
+              formatMinutes(
+                t.actual/60
+              )
+            }
+
+          </div>
+
+          <div class="task-buttons">
+
+            <button
+              class="icon-btn pin ${
+                t.pinned
+                ?"active"
+                :""
+              }"
+              title="Pin"
+              onclick="togglePin(${t.id})"
+            >
+              📌
+            </button>
+
+            <button
+              class="icon-btn"
+              title="${
+                t.running
+                ?"Pause"
+                :"Start"
+              }"
+              onclick="toggleTaskTimer(${t.id})"
+            >
+              ${
+                t.running
+                ?"⏸"
+                :"▶"
+              }
+            </button>
+
+            <button
+              class="icon-btn"
+              title="Edit"
+              onclick="openTaskModal(${t.id})"
+            >
+              ✏️
+            </button>
+
+            <button
+              class="icon-btn"
+              title="Delete"
+              onclick="deleteTask(${t.id})"
+            >
+              🗑
+            </button>
+
+          </div>
+
+        </div>
+
+        `;
+
+      }
+    ).join("");
+
+}
+
+
+/* =========================================================
+   TIMER
+========================================================= */
+
+function getCurrentActual(
+  task
+){
+
+  if(
+    !task.running ||
+    !task.startedAt
+  )
+    return task.actual || 0;
+
+  return (
+    task.actual || 0
+  ) +
+  (
+    Date.now() -
+    task.startedAt
+  ) / 1000;
+
+}
+
+
+function toggleTaskTimer(
+  id
+){
+
+  const task =
+    getDay()
+      .tasks
+      .find(
+        t =>
+          String(t.id) ===
+          String(id)
+      );
+
+  if(!task)
+    return;
+
+
+  if(task.running){
+
+    stopTask(task);
+
+    showToast(
+      "Timer paused."
+    );
+
+  }else{
+
+    stopAllRunningTimers();
+
+    task.running=true;
+
+    task.startedAt =
+      Date.now();
+
+    showToast(
+      "Timer started: " +
+      task.name
+    );
+
+  }
+
+
+  saveData();
+
+  renderEverything();
+
+}
+
+
+function stopTask(
+  task
+){
+
+  if(
+    task.running &&
+    task.startedAt
+  ){
+
+    task.actual =
+      (
+        task.actual || 0
+      ) +
+      (
+        Date.now() -
+        task.startedAt
+      ) / 1000;
+
+  }
+
+  task.running=false;
+
+  task.startedAt=null;
+
+}
+
+
+function stopAllRunningTimers(){
+
+  let changed=false;
+
+  Object.values(
+    appData.days
+  ).forEach(
+    day=>{
+
+      day.tasks.forEach(
+        task=>{
+
+          if(task.running){
+
+            stopTask(
+              task
+            );
+
+            changed=true;
+
+          }
+
+        }
+      );
+
+    }
+  );
+
+
+  if(changed)
+    saveData();
+
+}
+
+
+function updateLiveTimer(){
+
+  const running =
+    getDay()
+      .tasks
+      .some(
+        t=>t.running
+      );
+
+  if(running)
+    renderTasks();
+
+}
+
+
+function startNextTask(){
+
+  const day =
+    getDay();
+
+  const task =
+    day.tasks.find(
+      t =>
+        !t.completed &&
+        !t.running
+    );
+
+
+  if(!task){
+
+    showToast(
+      "No pending tasks."
+    );
+
+    return;
+
+  }
+
+
+  stopAllRunningTimers();
+
+  task.running=true;
+
+  task.startedAt =
+    Date.now();
+
+  saveData();
+
+  renderEverything();
+
+  scrollToId(
+    "taskSection"
+  );
+
+}
+
+
+/* =========================================================
+   COMPLETE
+========================================================= */
+
+function toggleComplete(
+  id
+){
+
+  const task =
+    getDay()
+      .tasks
+      .find(
+        t =>
+          String(t.id) ===
+          String(id)
+      );
+
+  if(!task)
+    return;
+
+
+  if(task.running)
+    stopTask(task);
+
+
+  task.completed =
+    !task.completed;
+
+
+  saveData();
+
+  renderEverything();
+
+}
+
+
+/* =========================================================
+   PIN
+========================================================= */
+
+function togglePin(
+  id
+){
+
+  const task =
+    getDay()
+      .tasks
+      .find(
+        t =>
+          String(t.id) ===
+          String(id)
+      );
+
+  if(!task)
+    return;
+
+
+  task.pinned =
+    !task.pinned;
+
+
+  saveData();
+
+  renderTasks();
+
+}
+
+
+/* =========================================================
+   DELETE
+========================================================= */
+
+function deleteTask(
+  id
+){
+
+  const day =
+    getDay();
+
+  const index =
+    day.tasks.findIndex(
+      t =>
+        String(t.id) ===
+        String(id)
+    );
+
+  if(index<0)
+    return;
+
+
+  const task =
+    day.tasks[index];
+
+
+  if(
+    !confirm(
+      `Delete "${task.name}"?`
+    )
+  )
+    return;
+
+
+  day.tasks.splice(
+    index,
+    1
+  );
+
+
+  normalizeOrder(
+    day
+  );
+
+  saveData();
+
+  renderEverything();
+
+}
+
+
+/* =========================================================
+   DUPLICATE
+========================================================= */
+
+function duplicateLastTask(){
+
+  const day =
+    getDay();
+
+
+  if(!day.tasks.length){
+
+    showToast(
+      "No task to duplicate."
+    );
+
+    return;
+
+  }
+
+
+  const source =
+    day.tasks[
+      day.tasks.length-1
+    ];
+
+
+  const copy =
+    JSON.parse(
+      JSON.stringify(
+        source
+      )
+    );
+
+
+  copy.id =
+    Date.now() +
+    Math.random();
+
+  copy.name +=
+    " (Copy)";
+
+  copy.completed=false;
+
+  copy.running=false;
+
+  copy.startedAt=null;
+
+  copy.actual=0;
+
+  copy.reminded=false;
+
+  copy.order =
+    day.tasks.length;
+
+
+  day.tasks.push(
+    copy
+  );
+
+  saveData();
+
+  renderEverything();
+
+  showToast(
+    "Task duplicated."
+  );
+
+}
+
+
+/* =========================================================
+   CLEAR COMPLETED
+========================================================= */
+
+function clearCompleted(){
+
+  const day =
+    getDay();
+
+  const completed =
+    day.tasks.filter(
+      t=>t.completed
+    ).length;
+
+
+  if(!completed){
+
+    showToast(
+      "No completed tasks."
+    );
+
+    return;
+
+  }
+
+
+  if(
+    !confirm(
+      `Remove ${completed} completed task(s)?`
+    )
+  )
+    return;
+
+
+  day.tasks =
+    day.tasks.filter(
+      t=>!t.completed
+    );
+
+
+  normalizeOrder(
+    day
+  );
+
+  saveData();
+
+  renderEverything();
+
+}
+
+
+/* =========================================================
+   DRAG DROP
+========================================================= */
+
+function dragStart(
+  event,
+  id
+){
+
+  draggedTaskId =
+    id;
+
+  event.dataTransfer.effectAllowed =
+    "move";
+
+}
+
+
+function dragOver(
+  event
+){
+
+  event.preventDefault();
+
+}
+
+
+function dropTask(
+  event,
+  targetId
+){
+
+  event.preventDefault();
+
+
+  if(
+    draggedTaskId===null ||
+    String(draggedTaskId) ===
+    String(targetId)
+  )
+    return;
+
+
+  const tasks =
+    getDay().tasks;
+
+
+  const from =
+    tasks.findIndex(
+      t =>
+        String(t.id) ===
+        String(draggedTaskId)
+    );
+
+
+  const to =
+    tasks.findIndex(
+      t =>
+        String(t.id) ===
+        String(targetId)
+    );
+
+
+  if(
+    from<0 ||
+    to<0
+  )
+    return;
+
+
+  const moved =
+    tasks.splice(
+      from,
+      1
+    )[0];
+
+
+  tasks.splice(
+    to,
+    0,
+    moved
+  );
+
+
+  normalizeOrder(
+    getDay()
+  );
+
+
+  draggedTaskId=null;
+
+  saveData();
+
+  renderTasks();
+
+}
+
+
+function normalizeOrder(
+  day
+){
+
+  day.tasks.forEach(
+    (task,index)=>
+      task.order=index
+  );
+
+}
+
+
+/* =========================================================
+   OVERDUE
+========================================================= */
+
+function isOverdue(
+  task
+){
+
+  if(task.completed)
+    return false;
+
+  if(!task.end)
+    return false;
+
+  if(
+    selectedDate !==
+    todayKey()
+  )
+    return false;
+
+
+  const now =
+    new Date();
+
+
+  const [
+    h,
+    m
+  ] =
+    task.end
+      .split(":")
+      .map(Number);
+
+
+  const end =
+    new Date();
+
+
+  end.setHours(
+    h,
+    m,
+    0,
+    0
+  );
+
+
+  return now>end;
+
+}
+
+
+function updateCurrentTimeVisuals(){
+
+  if(
+    selectedDate ===
+    todayKey()
+  ){
+
+    renderTasks();
+
+  }
+
+}
+
+
+/* =========================================================
+   TIMELINE
+========================================================= */
+
+function renderTimeline(){
+
+  const day =
+    getDay();
+
+
+  const tasks =
+    [...day.tasks]
+      .filter(
+        t=>t.start
+      )
+      .sort(
+        (a,b)=>
+          a.start.localeCompare(
+            b.start
+          )
+      );
+
+
+  document.getElementById(
+    "timelineCount"
+  ).textContent =
+    tasks.length +
+    " tasks";
+
+
+  const box =
+    document.getElementById(
+      "timeline"
+    );
+
+
+  if(!tasks.length){
+
+    box.innerHTML = `
+
+      <div class="empty">
+        Add start times to your tasks
+        to build a timeline.
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+  box.innerHTML =
+    tasks.map(
+      t=>`
+
+      <div class="timeline-item">
+
+        <div class="timeline-time">
+          ${escapeHTML(t.start)}
+        </div>
+
+        <div
+          class="timeline-dot"
+          style="
+            background:
+            ${
+              t.completed
+              ?"var(--green)"
+              :
+              t.priority==="High"
+              ?"var(--red)"
+              :
+              "var(--primary)"
+            };
+          "
+        ></div>
+
+        <div class="timeline-card">
+
+          <b>
+            ${escapeHTML(t.name)}
+          </b>
+
+          <div class="timeline-meta">
+
+            <span class="badge category">
+              ${escapeHTML(t.category || "Work")}
+            </span>
+
+            <span class="badge ${
+              String(
+                t.priority ||
+                "Medium"
+              ).toLowerCase()
+            }">
+              ${escapeHTML(
+                t.priority ||
+                "Medium"
+              )}
+            </span>
+
+            ${
+              t.end
+              ?
+              `<span class="badge">
+                ${escapeHTML(t.start)}–${escapeHTML(t.end)}
+              </span>`
+              :
+              ""
+            }
+
+          </div>
+
+        </div>
+
+      </div>
+
+    `
+    ).join("");
+
+}
+
+
+/* =========================================================
+   STATS
+========================================================= */
+
+function updateStats(){
+
+  const tasks =
+    getDay().tasks;
+
+
+  const total =
+    tasks.length;
+
+
+  const completed =
+    tasks.filter(
+      t=>t.completed
+    ).length;
+
+
+  const planned =
+    tasks.reduce(
+      (sum,t)=>
+        sum +
+        (
+          t.estimate ||
+          getMinutes(
+            t.start,
+            t.end
+          )
+        ),
+      0
+    );
+
+
+  const actual =
+    tasks.reduce(
+      (sum,t)=>
+        sum +
+        getCurrentActual(t)/60,
+      0
+    );
+
+
+  const overdue =
+    tasks.filter(
+      isOverdue
+    ).length;
+
+
+  const completion =
+    total
+    ?
+    Math.round(
+      completed /
+      total *
+      100
+    )
+    :
+    0;
+
+
+  let efficiency=0;
+
+
+  if(
+    planned>0 &&
+    actual>0
+  ){
+
+    efficiency =
+      Math.min(
+        100,
+        Math.round(
+          planned /
+          actual *
+          100
+        )
+      );
+
+  }
+
+
+  const high =
+    tasks.filter(
+      t=>t.priority==="High"
+    );
+
+
+  const highDone =
+    high.filter(
+      t=>t.completed
+    ).length;
+
+
+  const highPercent =
+    high.length
+    ?
+    Math.round(
+      highDone /
+      high.length *
+      100
+    )
+    :
+    0;
+
+
+  const score =
+    total
+    ?
+    Math.round(
+      completion*.6 +
+      efficiency*.25 +
+      highPercent*.15
+    )
+    :
+    0;
+
+
+  document.getElementById(
+    "score"
+  ).textContent =
+    score+"%";
+
+
+  document.getElementById(
+    "taskCount"
+  ).textContent =
+    completed +
+    "/" +
+    total;
+
+
+  document.getElementById(
+    "planned"
+  ).textContent =
+    formatMinutes(
+      planned
+    );
+
+
+  document.getElementById(
+    "actual"
+  ).textContent =
+    formatMinutes(
+      actual
+    );
+
+
+  document.getElementById(
+    "overdue"
+  ).textContent =
+    overdue;
+
+
+  document.getElementById(
+    "streak"
+  ).textContent =
+    calculateStreak();
+
+
+  document.getElementById(
+    "completionMetric"
+  ).textContent =
+    completion+"%";
+
+
+  document.getElementById(
+    "completionBar"
+  ).style.width =
+    completion+"%";
+
+
+  document.getElementById(
+    "efficiencyMetric"
+  ).textContent =
+    efficiency+"%";
+
+
+  document.getElementById(
+    "efficiencyBar"
+  ).style.width =
+    efficiency+"%";
+
+
+  document.getElementById(
+    "highMetric"
+  ).textContent =
+    highPercent+"%";
+
+
+  document.getElementById(
+    "highBar"
+  ).style.width =
+    highPercent+"%";
+
+
+  document.getElementById(
+    "goalPercent"
+  ).textContent =
+    completion+"%";
+
+
+  document.getElementById(
+    "goalProgress"
+  ).style.width =
+    completion+"%";
+
+
+  document.getElementById(
+    "goalCircle"
+  ).style.background =
+    `
+      conic-gradient(
+        var(--primary)
+        ${completion*3.6}deg,
+        var(--border)
+        ${completion*3.6}deg
+      )
+    `;
+
+
+  const goal =
+    document.getElementById(
+      "dailyGoal"
+    ).value;
+
+
+  document.getElementById(
+    "goalDisplay"
+  ).textContent =
+    goal ||
+    "Set your main goal above.";
+
+
+  document.getElementById(
+    "goalStatus"
+  ).textContent =
+    completion===100
+    ?
+    "🎉 Complete"
+    :
+    completion>0
+    ?
+    "🔥 In progress"
+    :
+    "Not started";
+
+}
+
+
+/* =========================================================
+   CALENDAR
+========================================================= */
+
+function renderCalendar(){
+
+  const y =
+    calendarDate.getFullYear();
+
+  const m =
+    calendarDate.getMonth();
+
+
+  document.getElementById(
+    "calendarTitle"
+  ).textContent =
+    calendarDate.toLocaleDateString(
+      undefined,
+      {
+        month:"long",
+        year:"numeric"
+      }
+    );
+
+
+  const box =
+    document.getElementById(
+      "calendar"
+    );
+
+
+  const names = [
+    "Sun",
+    "Mon",
+    "Tue",
+    "Wed",
+    "Thu",
+    "Fri",
+    "Sat"
+  ];
+
+
+  let html =
+    names.map(
+      n =>
+        `<div class="cal-day-name">
+          ${n}
+        </div>`
+    ).join("");
+
+
+  const first =
+    new Date(
+      y,
+      m,
+      1
+    ).getDay();
+
+
+  const days =
+    new Date(
+      y,
+      m+1,
+      0
+    ).getDate();
+
+
+  for(
+    let i=0;
+    i<first;
+    i++
+  ){
+
+    html +=
+      `<div></div>`;
+
+  }
+
+
+  for(
+    let d=1;
+    d<=days;
+    d++
+  ){
+
+    const date =
+      formatDate(
+        new Date(
+          y,
+          m,
+          d
+        )
+      );
+
+
+    const day =
+      appData.days[date];
+
+
+    const count =
+      day
+      ?
+      day.tasks.length
+      :
+      0;
+
+
+    const done =
+      day
+      ?
+      day.tasks.filter(
+        t=>t.completed
+      ).length
+      :
+      0;
+
+
+    const isToday =
+      date===todayKey();
+
+
+    const selected =
+      date===selectedDate;
+
+
+    html += `
+
+      <div
+        class="cal-day
+        ${isToday?"today":""}
+        ${selected?"selected":""}"
+        onclick="selectCalendarDate('${date}')"
+      >
+
+        <div class="cal-number">
+          ${d}
+        </div>
+
+        ${
+          count
+          ?
+          `<div class="cal-count">
+            ${done}/${count} tasks
+          </div>`
+          :
+          ""
+        }
+
+      </div>
+
+    `;
+
+  }
+
+
+  box.innerHTML =
+    html;
+
+}
+
+
+function selectCalendarDate(
+  date
+){
+
+  selectedDate =
+    date;
+
+  document.getElementById(
+    "selectedDate"
+  ).value =
+    date;
+
+  loadCurrentDay();
+
+  renderEverything();
+
+}
+
+
+function changeMonth(
+  amount
+){
+
+  calendarDate.setMonth(
+    calendarDate.getMonth() +
+    amount
+  );
+
+  renderCalendar();
+
+}
+
+
+/* =========================================================
+   WEEK
+========================================================= */
+
+function getWeekStart(){
+
+  const d =
+    parseDate(
+      selectedDate
+    );
+
+
+  const day =
+    d.getDay();
+
+
+  d.setDate(
+    d.getDate() -
+    day
+  );
+
+
+  d.setDate(
+    d.getDate() +
+    weekOffset*7
+  );
+
+
+  return d;
+
+}
+
+
+function changeWeek(
+  amount
+){
+
+  weekOffset +=
+    amount;
+
+  renderWeek();
+
+}
+
+
+function renderWeek(){
+
+  const start =
+    getWeekStart();
+
+
+  const box =
+    document.getElementById(
+      "weekGrid"
+    );
+
+
+  let html="";
+
+
+  for(
+    let i=0;
+    i<7;
+    i++
+  ){
+
+    const d =
+      new Date(start);
+
+
+    d.setDate(
+      start.getDate()+i
+    );
+
+
+    const date =
+      formatDate(d);
+
+
+    const day =
+      appData.days[date];
+
+
+    const tasks =
+      day
+      ?
+      day.tasks
+      :
+      [];
+
+
+    html += `
+
+      <div
+        class="week-day"
+        onclick="selectCalendarDate('${date}')"
+        style="cursor:pointer"
+      >
+
+        <div class="week-day-head">
+
+          ${d.toLocaleDateString(
+            undefined,
+            {
+              weekday:"short",
+              day:"numeric"
+            }
+          )}
+
+        </div>
+
+        ${
+          tasks.length
+          ?
+          tasks
+            .slice(0,5)
+            .map(
+              t =>
+                `
+                <div class="week-task">
+                  ${t.completed?"✓ ":""}
+                  ${escapeHTML(t.name)}
+                </div>
+                `
+            )
+            .join("")
+          :
+          `
+          <span
+            class="muted"
+            style="font-size:10px"
+          >
+            No tasks
+          </span>
+          `
+        }
+
+        ${
+          tasks.length>5
+          ?
+          `
+          <div
+            class="muted"
+            style="font-size:9px"
+          >
+            +${tasks.length-5} more
+          </div>
+          `
+          :
+          ""
+        }
+
+      </div>
+
+    `;
+
+  }
+
+
+  box.innerHTML =
+    html;
+
+}
+
+
+/* =========================================================
+   CHART
+========================================================= */
+
+function renderChart(){
+
+  const chart =
+    document.getElementById(
+      "chart"
+    );
+
+
+  let html="";
+
+
+  for(
+    let i=6;
+    i>=0;
+    i--
+  ){
+
+    const date =
+      addDays(
+        todayKey(),
+        -i
+      );
+
+
+    const day =
+      appData.days[date];
+
+
+    let percent=0;
+
+
+    if(
+      day &&
+      day.tasks.length
+    ){
+
+      percent =
+        Math.round(
+          day.tasks.filter(
+            t=>t.completed
+          ).length /
+          day.tasks.length *
+          100
+        );
+
+    }
+
+
+    const d =
+      parseDate(
+        date
+      );
+
+
+    html += `
+
+      <div class="bar-wrap">
+
+        <div class="bar-value">
+          ${percent}%
+        </div>
+
+        <div
+          class="bar"
+          style="
+            height:
+            ${Math.max(
+              4,
+              percent
+            )}%
+          "
+        ></div>
+
+        <div class="bar-label">
+
+          ${d.toLocaleDateString(
+            undefined,
+            {
+              weekday:"short"
+            }
+          )}
+
+        </div>
+
+      </div>
+
+    `;
+
+  }
+
+
+  chart.innerHTML =
+    html;
+
+}
+
+
+/* =========================================================
+   FOCUS TASKS
+========================================================= */
+
+function renderFocus(){
+
+  const box =
+    document.getElementById(
+      "focusTasks"
+    );
+
+
+  const tasks =
+    getDay()
+      .tasks
+      .filter(
+        t =>
+          t.priority==="High" &&
+          !t.completed
+      );
+
+
+  if(!tasks.length){
+
+    box.innerHTML = `
+
+      <div class="muted">
+        🎉 No high-priority tasks remaining.
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+  box.innerHTML =
+    tasks.map(
+      t=>`
+
+      <div
+        style="
+          padding:10px 0;
+          border-bottom:
+            1px solid var(--border)
+        "
+      >
+
+        <b>
+          🔴 ${escapeHTML(t.name)}
+        </b>
+
+        <div
+          class="muted"
+          style="
+            font-size:10px;
+            margin-top:3px
+          "
+        >
+          ${escapeHTML(t.category || "Work")}
+          ${t.start?" • "+escapeHTML(t.start):""}
+        </div>
+
+      </div>
+
+    `
+    ).join("");
+
+}
+
+
+/* =========================================================
+   STREAK
+========================================================= */
+
+function calculateStreak(){
+
+  let streak=0;
+
+  let date =
+    todayKey();
+
+
+  for(
+    let i=0;
+    i<60;
+    i++
+  ){
+
+    const day =
+      appData.days[date];
+
+
+    if(
+      day &&
+      day.tasks.length>0 &&
+      day.tasks.every(
+        t=>t.completed
+      )
+    ){
+
+      streak++;
+
+      date =
+        addDays(
+          date,
+          -1
+        );
+
+    }else{
+
+      break;
+
+    }
+
+  }
+
+
+  return streak;
+
+}
+
+
+/* =========================================================
+   BREAK
+========================================================= */
+
+function openBreakModal(){
+
+  document.getElementById(
+    "breakModal"
+  ).classList.add(
+    "show"
+  );
+
+}
+
+
+function closeBreakModal(){
+
+  document.getElementById(
+    "breakModal"
+  ).classList.remove(
+    "show"
+  );
+
+}
+
+
+function startBreak(){
+
+  clearInterval(
+    breakInterval
+  );
+
+
+  breakInterval =
+    setInterval(
+      ()=>{
+
+        if(
+          breakSeconds<=0
+        ){
+
+          clearInterval(
+            breakInterval
+          );
+
+          notify(
+            "Break finished",
+            "Time to get back to work."
+          );
+
+          showToast(
+            "Break finished ☀️"
+          );
+
+          return;
+
+        }
+
+
+        breakSeconds--;
+
+        renderBreakClock();
+
+      },
+      1000
+    );
+
+}
+
+
+function resetBreak(){
+
+  clearInterval(
+    breakInterval
+  );
+
+  breakSeconds=300;
+
+  renderBreakClock();
+
+}
+
+
+function renderBreakClock(){
+
+  const m =
+    String(
+      Math.floor(
+        breakSeconds/60
+      )
+    ).padStart(
+      2,
+      "0"
+    );
+
+
+  const s =
+    String(
+      breakSeconds%60
+    ).padStart(
+      2,
+      "0"
+    );
+
+
+  document.getElementById(
+    "breakClock"
+  ).textContent =
+    m + ":" + s;
+
+}
+
+
+/* =========================================================
+   NOTIFICATIONS
+========================================================= */
+
+function requestNotificationPermission(){
+
+  if(
+    "Notification" in window &&
+    Notification.permission ===
+    "default"
+  ){
+
+    Notification.requestPermission();
+
+  }
+
+}
+
+
+function notify(
+  title,
+  message
+){
+
+  if(
+    "Notification" in window &&
+    Notification.permission ===
+    "granted"
+  ){
+
+    new Notification(
+      title,
+      {
+        body:message
+      }
+    );
+
+  }
+
+}
+
+
+function checkReminders(){
+
+  const day =
+    getDay();
+
+
+  if(
+    selectedDate !==
+    todayKey()
+  )
+    return;
+
+
+  const now =
+    new Date();
+
+
+  day.tasks.forEach(
+    task=>{
+
+      if(
+        task.completed ||
+        task.reminded ||
+        !task.start ||
+        task.reminder==="none"
+      )
+        return;
+
+
+      const [
+        h,
+        m
+      ] =
+        task.start
+          .split(":")
+          .map(Number);
+
+
+      const start =
+        new Date();
+
+
+      start.setHours(
+        h,
+        m,
+        0,
+        0
+      );
+
+
+      const minutes =
+        Number(
+          task.reminder
+        );
+
+
+      const difference =
+        (
+          start-now
+        ) / 60000;
+
+
+      if(
+        difference<=minutes &&
+        difference>=0
+      ){
+
+        task.reminded=true;
+
+
+        notify(
+          "Task reminder",
+          `${task.name} starts at ${task.start}.`
+        );
+
+
+        saveData();
+
+      }
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+   EXPORT JSON
+========================================================= */
+
+function exportJSON(){
+
+  saveCurrentDay();
+
+
+  const blob =
+    new Blob(
+      [
+        JSON.stringify(
+          appData,
+          null,
+          2
+        )
+      ],
+      {
+        type:
+          "application/json"
+      }
+    );
+
+
+  downloadBlob(
+    blob,
+    "daily-work-planner-backup.json"
+  );
+
+
+  showToast(
+    "Backup downloaded."
+  );
+
+}
+
+
+/* =========================================================
+   IMPORT JSON
+========================================================= */
+
+function importJSON(
+  event
+){
+
+  const file =
+    event.target.files[0];
+
+
+  if(!file)
+    return;
+
+
+  const reader =
+    new FileReader();
+
+
+  reader.onload =
+    e=>{
+
+      try{
+
+        const imported =
+          JSON.parse(
+            e.target.result
+          );
+
+
+        if(
+          !imported ||
+          typeof imported!=="object" ||
+          !imported.days
+        ){
+
+          throw new Error(
+            "Invalid backup"
+          );
+
+        }
+
+
+        appData =
+          normalizeAppData(
+            imported
+          );
+
+        saveData();
+
+        loadCurrentDay();
+
+        renderEverything();
+
+        showToast(
+          "Backup restored."
+        );
+
+
+      }catch(error){
+
+        alert(
+          "This backup file is not valid."
+        );
+
+      }
+
+    };
+
+
+  reader.readAsText(
+    file
+  );
+
+  event.target.value="";
+
+}
+
+
+/* =========================================================
+   CSV
+========================================================= */
+
+function exportCSV(){
+
+  const rows = [
+
+    [
+      "Date",
+      "Task",
+      "Category",
+      "Start",
+      "End",
+      "Priority",
+      "Status",
+      "Planned Minutes",
+      "Actual Minutes",
+      "Repeat",
+      "Description"
+    ]
+
+  ];
+
+
+  Object.entries(
+    appData.days
+  ).forEach(
+    ([date,day])=>{
+
+      day.tasks.forEach(
+        t=>{
+
+          rows.push([
+
+            date,
+
+            t.name,
+
+            t.category,
+
+            t.start || "",
+
+            t.end || "",
+
+            t.priority,
+
+            t.completed
+              ?"Completed"
+              :"Pending",
+
+            t.estimate ||
+              getMinutes(
+                t.start,
+                t.end
+              ),
+
+            Math.round(
+              (t.actual || 0)/60
+            ),
+
+            t.repeat,
+
+            t.description || ""
+
+          ]);
+
+        }
+      );
+
+    }
+  );
+
+
+  const csv =
+    rows.map(
+      row =>
+        row.map(
+          value =>
+            `"${String(value)
+              .replace(
+                /"/g,
+                '""'
+              )}"`
+        ).join(",")
+    ).join("\n");
+
+
+  downloadBlob(
+
+    new Blob(
+      [csv],
+      {
+        type:
+          "text/csv"
+      }
+    ),
+
+    "daily-work-planner.csv"
+
+  );
+
+
+  showToast(
+    "CSV exported."
+  );
+
+}
+
+
+/* =========================================================
+   DOWNLOAD
+========================================================= */
+
+function downloadBlob(
+  blob,
+  name
+){
+
+  const url =
+    URL.createObjectURL(
+      blob
+    );
+
+
+  const a =
+    document.createElement(
+      "a"
+    );
+
+
+  a.href=url;
+
+  a.download=name;
+
+  document.body.appendChild(a);
+
+  a.click();
+
+  a.remove();
+
+
+  setTimeout(
+    () =>
+      URL.revokeObjectURL(
+        url
+      ),
+    1000
+  );
+
+}
+
+
+/* =========================================================
+   THEME
+========================================================= */
+
+function toggleTheme(){
+
+  appData.theme =
+    appData.theme==="dark"
+    ?
+    "light"
+    :
+    "dark";
+
+
+  saveData();
+
+  applyTheme();
+
+}
+
+
+function applyTheme(){
+
+  document.body.classList.toggle(
+    "dark",
+    appData.theme==="dark"
+  );
+
+}
+
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+function getMinutes(
+  start,
+  end
+){
+
+  if(
+    !start ||
+    !end
+  )
+    return 0;
+
+
+  const [
+    h1,
+    m1
+  ] =
+    start
+      .split(":")
+      .map(Number);
+
+
+  const [
+    h2,
+    m2
+  ] =
+    end
+      .split(":")
+      .map(Number);
+
+
+  let result =
+    (
+      h2*60+m2
+    ) -
+    (
+      h1*60+m1
+    );
+
+
+  if(result<0)
+    result+=1440;
+
+
+  return result;
+
+}
+
+
+function formatMinutes(
+  minutes
+){
+
+  minutes =
+    Math.round(
+      minutes || 0
+    );
+
+
+  const h =
+    Math.floor(
+      minutes/60
+    );
+
+
+  const m =
+    minutes%60;
+
+
+  if(h===0)
+    return `${m}m`;
+
+
+  if(m===0)
+    return `${h}h`;
+
+
+  return `${h}h ${m}m`;
+
+}
+
+
+function formatSeconds(
+  seconds
+){
+
+  seconds =
+    Math.floor(
+      seconds || 0
+    );
+
+
+  const h =
+    Math.floor(
+      seconds/3600
+    );
+
+
+  const m =
+    Math.floor(
+      (seconds%3600)/60
+    );
+
+
+  const s =
+    seconds%60;
+
+
+  if(h>0){
+
+    return `${h}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+
+  }
+
+
+  return `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+
+}
+
+
+function escapeHTML(
+  value
+){
+
+  return String(
+    value ?? ""
+  )
+  .replace(
+    /&/g,
+    "&amp;"
+  )
+  .replace(
+    /</g,
+    "&lt;"
+  )
+  .replace(
+    />/g,
+    "&gt;"
+  )
+  .replace(
+    /"/g,
+    "&quot;"
+  )
+  .replace(
+    /'/g,
+    "&#039;"
+  );
+
+}
+
+
+function scrollToId(
+  id
+){
+
+  const element =
+    document.getElementById(
+      id
+    );
+
+
+  if(element){
+
+    element.scrollIntoView({
+      behavior:"smooth",
+      block:"start"
+    });
+
+  }
+
+}
+
+
+function showSection(){
+
+  window.scrollTo({
+    top:0,
+    behavior:"smooth"
+  });
+
+}
+
+
+function showToast(
+  message
+){
+
+  const toast =
+    document.getElementById(
+      "toast"
+    );
+
+
+  toast.textContent =
+    message;
+
+
+  toast.classList.add(
+    "show"
+  );
+
+
+  clearTimeout(
+    toast._timer
+  );
+
+
+  toast._timer =
+    setTimeout(
+      () =>
+        toast.classList.remove(
+          "show"
+        ),
+      2200
+    );
+
+}
+
+
+/* =========================================================
+   RENDER EVERYTHING
+========================================================= */
+
+function renderEverything(){
+
+  loadCurrentDay();
+
+  renderTasks();
+
+  renderTimeline();
+
+  renderCalendar();
+
+  renderWeek();
+
+  renderChart();
+
+  renderFocus();
+
+  updateStats();
+
+}
+
+
+/* =========================================================
+   KEYBOARD
+========================================================= */
+
+document.addEventListener(
+  "keydown",
+  event=>{
+
+    if(
+      event.ctrlKey &&
+      event.key.toLowerCase()==="n"
+    ){
+
+      event.preventDefault();
+
+      if(firebaseUser)
+        openTaskModal();
+
+    }
+
+
+    if(
+      event.key==="Escape"
+    ){
+
+      closeTaskModal();
+
+      closeBreakModal();
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   MODAL OUTSIDE CLICK
+========================================================= */
+
+document.getElementById(
+  "taskModal"
+).addEventListener(
+  "click",
+  event=>{
+
+    if(
+      event.target.id ===
+      "taskModal"
+    ){
+
+      closeTaskModal();
+
+    }
+
+  }
+);
+
+
+document.getElementById(
+  "breakModal"
+).addEventListener(
+  "click",
+  event=>{
+
+    if(
+      event.target.id ===
+      "breakModal"
+    ){
+
+      closeBreakModal();
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   AUTO ESTIMATE
+========================================================= */
+
+document.getElementById(
+  "taskStart"
+).addEventListener(
+  "change",
+  autoEstimate
+);
+
+
+document.getElementById(
+  "taskEnd"
+).addEventListener(
+  "change",
+  autoEstimate
+);
+
+
+function autoEstimate(){
+
+  const start =
+    document.getElementById(
+      "taskStart"
+    ).value;
+
+
+  const end =
+    document.getElementById(
+      "taskEnd"
+    ).value;
+
+
+  const estimate =
+    document.getElementById(
+      "taskEstimate"
+    );
+
+
+  if(
+    start &&
+    end
+  ){
+
+    estimate.value =
+      getMinutes(
+        start,
+        end
+      );
+
+  }
+
+}
+
+
+/* =========================================================
+   INITIAL APP
+========================================================= */
+
+document.addEventListener(
+  "DOMContentLoaded",
+  ()=>{
+
+    loadLocalData();
+
+    document.getElementById(
+      "selectedDate"
+    ).value =
+      selectedDate;
+
+    applyTheme();
+
+    updateGreeting();
+
+    loadCurrentDay();
+
+    renderEverything();
+
+    requestNotificationPermission();
+
+    setInterval(
+      checkReminders,
+      30000
+    );
+
+    setInterval(
+      ()=>{
+        updateGreeting();
+        updateLiveTimer();
+        updateCurrentTimeVisuals();
+      },
+      1000
+    );
+
+  }
+);
+
+
+/* =========================================================
+   ONLINE / OFFLINE
+========================================================= */
+
+window.addEventListener(
+  "online",
+  ()=>{
+
+    if(firebaseUser){
+
+      setSyncStatus(
+        true
+      );
+
+      saveToFirebase();
+
+      showToast(
+        "🌐 Back online — syncing..."
+      );
+
+    }
+
+  }
+);
+
+
+window.addEventListener(
+  "offline",
+  ()=>{
+
+    setSyncStatus(
+      false
+    );
+
+    showToast(
+      "📴 Offline mode enabled"
+    );
+
+  }
+);
+
+
+/* =========================================================
+   BEFORE CLOSE
+========================================================= */
+
+window.addEventListener(
+  "beforeunload",
+  ()=>{
+
+    Object.values(
+      appData.days
+    ).forEach(
+      day=>{
+
+        day.tasks.forEach(
+          task=>{
+
+            if(task.running)
+              stopTask(task);
+
+          }
+        );
+
+      }
+    );
+
+
+    saveLocalOnly();
+
+  }
+);
+
+</script>
+
+</body>
+</html>
